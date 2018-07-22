@@ -43,10 +43,31 @@ public class MainActivity extends AppCompatActivity {
 
         myProgressbar = MyProgressbar.getSimpleProgressDialogue(this, false);
 
+        svSearch.setQuery("",true);
+        svSearch.setFocusable(true);
+        svSearch.setIconified(false);
+        svSearch.requestFocusFromTouch();
+
+//        svSearch.requestFocus();
+//        //search view click anywhere
+//        svSearch.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                svSearch.setIconified(false);
+//            }
+//        });
+
+        //on query change listener
         svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+
+                if (newText.length() == 0) {
+                    mPageQSRModelList.clear();
+                    mSearchResultAdapter.notifyDataSetChanged();
+                }
+                getSearchResult(newText);
                 return false;
             }
 
@@ -62,18 +83,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void getSearchResult(String query) {
 
-        showHideProgressBar(true);
+        //showHideProgressBar(true);
         new ApiProvider().getSearchResult(new ApiCallBack() {
             @Override
             public void onError(Exception e) {
 
-                showHideProgressBar(false);
+                //showHideProgressBar(false);
             }
 
             @Override
             public void onModel(BaseModel baseModel) {
 
-                showHideProgressBar(false);
+                //showHideProgressBar(false);
                 if (baseModel == null || !(baseModel instanceof SearchResultModel)) return;
 
                 SearchResultModel searchResultModel = (SearchResultModel) baseModel;
@@ -92,12 +113,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onJson(JsonObject jsonObject) {
 
-                showHideProgressBar(false);
+                //showHideProgressBar(false);
             }
 
             @Override
             public void onAPIFail() {
-                showHideProgressBar(false);
+                //showHideProgressBar(false);
             }
         }, query);
     }
