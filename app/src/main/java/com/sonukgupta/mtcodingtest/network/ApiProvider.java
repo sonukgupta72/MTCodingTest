@@ -31,7 +31,7 @@ public class ApiProvider {
 
     public void getSearchResult(final ApiCallBack apiCallBack, final String searchQuery) {
         mApiServiceNetwork.getNetworkService(null, REQUEST_URL)
-                .getSearchResult(/*searchQuery*/)
+                .getSearchResult("query","json", searchQuery, 10, "pageterms|pageimages","thumbnail","description",180,10,2,1, "prefixsearch")
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Subscriber<SearchResultModel>() {
