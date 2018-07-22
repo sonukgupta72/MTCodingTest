@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
@@ -20,6 +21,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
+    SearchView svSearch;
     SearchResultAdapter mSearchResultAdapter;
     List<PageQSRModel> mPageQSRModelList = new ArrayList<>();
 
@@ -29,6 +31,27 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         recyclerView = (RecyclerView) findViewById(R.id.rvSearchResult);
+        svSearch  = (SearchView) findViewById(R.id.svSearch);
+
+        svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                // Do your task here
+                getSearchResult(query);
+                return false;
+            }
+
+        });
+    }
+
+    private void getSearchResult(String query) {
+
 
         new ApiProvider().getSearchResult(new ApiCallBack() {
             @Override
@@ -62,9 +85,8 @@ public class MainActivity extends AppCompatActivity {
             public void onAPIFail() {
 
             }
-        }, "");
+        }, query);
     }
-
 
     private void setUpRecyclerView() {
         //here set the recycler view and set the adapter
