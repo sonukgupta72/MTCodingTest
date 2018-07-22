@@ -36,7 +36,6 @@ public class DetailsActivity extends AppCompatActivity {
 
 
         if (mPageId != null) {
-            wvDetails.loadUrl(Constants.WIKI_URL + mPageId);
             wvDetails.getSettings().setJavaScriptEnabled(false);
 
             wvDetails.setWebViewClient(new WebViewClient() {
@@ -54,7 +53,7 @@ public class DetailsActivity extends AppCompatActivity {
             });
 
             if (isNetworkConnected()) {
-                wvDetails.loadUrl(Constants.WIKI_URL + mPageId);
+                wvDetails.loadUrl(Constants.WIKI_URL + mRequestName.trim().replace(" ", "_"));
             } else {
                 Toast.makeText(this, getString(R.string.error_network_connection), Toast.LENGTH_LONG).show();
             }
