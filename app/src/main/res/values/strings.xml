@@ -1,4 +1,6 @@
 <resources>
     <string name="app_name">WIKIPEDIA</string>
     <string name="label_search">Search</string>
+    <string name="error_network_connection">Please check your network connection and try again.</string>
+    <string name="progress_bar_message">Please wait...</string>
 </resources>

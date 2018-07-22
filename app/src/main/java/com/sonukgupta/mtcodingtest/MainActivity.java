@@ -1,14 +1,21 @@
 package com.sonukgupta.mtcodingtest;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+import com.sonukgupta.mtcodingtest.cuatomWidget.MyProgressbar;
 import com.sonukgupta.mtcodingtest.model.BaseModel;
 import com.sonukgupta.mtcodingtest.model.PageQSRModel;
 import com.sonukgupta.mtcodingtest.model.SearchResultModel;
@@ -24,6 +31,7 @@ public class MainActivity extends AppCompatActivity {
     SearchView svSearch;
     SearchResultAdapter mSearchResultAdapter;
     List<PageQSRModel> mPageQSRModelList = new ArrayList<>();
+    AlertDialog myProgressbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView = (RecyclerView) findViewById(R.id.rvSearchResult);
         svSearch  = (SearchView) findViewById(R.id.svSearch);
+
+        myProgressbar = MyProgressbar.getSimpleProgressDialogue(this, false);
 
         svSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 
@@ -52,16 +62,18 @@ public class MainActivity extends AppCompatActivity {
 
     private void getSearchResult(String query) {
 
-
+        showHideProgressBar(true);
         new ApiProvider().getSearchResult(new ApiCallBack() {
             @Override
             public void onError(Exception e) {
 
+                showHideProgressBar(false);
             }
 
             @Override
             public void onModel(BaseModel baseModel) {
 
+                showHideProgressBar(false);
                 if (baseModel == null || !(baseModel instanceof SearchResultModel)) return;
 
                 SearchResultModel searchResultModel = (SearchResultModel) baseModel;
@@ -71,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         && searchResultModel.getQuerySearchResultModel().getPages() != null
                         && searchResultModel.getQuerySearchResultModel().getPages().size() > 0){
 
+                    mPageQSRModelList.clear();
                     mPageQSRModelList = searchResultModel.getQuerySearchResultModel().getPages();
                     setUpRecyclerView();
                 }
@@ -79,11 +92,12 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onJson(JsonObject jsonObject) {
 
+                showHideProgressBar(false);
             }
 
             @Override
             public void onAPIFail() {
-
+                showHideProgressBar(false);
             }
         }, query);
     }
@@ -105,8 +119,15 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra(Constants.PAGE_ID, mPageQSRModelList.get(position).getPageId());
             intent.putExtra(Constants.REQUEST_NAME, mPageQSRModelList.get(position).getTitle());
             startActivity(intent);
-
-            //Toast.makeText(MainActivity.this, position + " : clicked", Toast.LENGTH_LONG).show();
         }
     };
+
+    public void showHideProgressBar(boolean flag) {
+        if (flag && !myProgressbar.isShowing()) {
+            myProgressbar.show();
+        } else if (!flag && myProgressbar.isShowing()){
+            myProgressbar.dismiss();
+        }
+    }
+
 }

@@ -1,9 +1,14 @@
 package com.sonukgupta.mtcodingtest;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 public class DetailsActivity extends AppCompatActivity {
@@ -19,7 +24,7 @@ public class DetailsActivity extends AppCompatActivity {
 
         wvDetails = (WebView) findViewById(R.id.wvDetails);
 
-        if (getIntent()!=null && getIntent().getExtras() != null) {
+        if (getIntent() != null && getIntent().getExtras() != null) {
             mPageId = getIntent().getExtras().getString(Constants.PAGE_ID);
             mRequestName = getIntent().getExtras().getString(Constants.REQUEST_NAME);
         }
@@ -30,8 +35,29 @@ public class DetailsActivity extends AppCompatActivity {
         }
 
 
-        if (mPageId  != null) {
+        if (mPageId != null) {
             wvDetails.loadUrl(Constants.WIKI_URL + mPageId);
+            wvDetails.getSettings().setJavaScriptEnabled(false);
+
+            wvDetails.setWebViewClient(new WebViewClient() {
+                @SuppressWarnings("deprecation")
+                @Override
+                public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                    Toast.makeText(DetailsActivity.this, description, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
+                    // Redirect to deprecated method, so you can use it in all SDK versions
+                    //onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
+                }
+            });
+
+            if (isNetworkConnected()) {
+                wvDetails.loadUrl(Constants.WIKI_URL + mPageId);
+            } else {
+                Toast.makeText(this, getString(R.string.error_network_connection), Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -44,5 +70,11 @@ public class DetailsActivity extends AppCompatActivity {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    private boolean isNetworkConnected() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        return cm.getActiveNetworkInfo() != null;
     }
 }
